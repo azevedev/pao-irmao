@@ -255,7 +255,7 @@ strong { color: var(--ink); font-weight: 600; }
   position: fixed;
   inset: 0 0 auto 0;
   height: 3px;
-  z-index: 95;
+  z-index: 101;
   pointer-events: none;
   transition: opacity .3s;
 }
@@ -634,9 +634,9 @@ strong { color: var(--ink); font-weight: 600; }
 }
 .seal text {
   font-family: var(--font-body);
-  font-size: 7.1px;
+  font-size: 6px;
   font-weight: 500;
-  letter-spacing: .1em;
+  letter-spacing: .06em;
   text-transform: uppercase;
   fill: var(--ink-3);
 }
