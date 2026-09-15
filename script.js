@@ -28,12 +28,11 @@
   window.addEventListener('resize', onScroll, { passive: true });
 
   /* ---------------------------------------------------------------
-     1. Cabeçalho: fundo ao rolar, barra de progresso, botão de topo
+     1. Cabeçalho: fundo ao rolar, botão de topo
      --------------------------------------------------------------- */
 
   var header = $('#site-header');
   var headerInner = $('.site-header__inner');
-  var progress = $('#scroll-progress i');
   var toTop = $('#to-top');
 
   /* Largura da ilha: o cabeçalho recolhido tem a largura do próprio conteúdo.
@@ -77,10 +76,6 @@
   scrollTasks.push(function (y) {
     if (header) header.classList.toggle('is-stuck', y > 24);
     if (toTop) toTop.classList.toggle('is-on', y > 900);
-    if (progress) {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      progress.style.transform = 'scaleX(' + (max > 0 ? Math.min(y / max, 1) : 0) + ')';
-    }
   });
 
   if (toTop) {

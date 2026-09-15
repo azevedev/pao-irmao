@@ -102,7 +102,6 @@ body.is-locked {
   width: 100%;
   overflow: hidden;
 }
-body.is-locked .scroll-progress { opacity: 0; }
 
 img, svg { display: block; max-width: 100%; }
 img { height: auto; }
@@ -250,23 +249,6 @@ strong { color: var(--ink); font-weight: 600; }
 .btn--wide { width: 100%; justify-content: center; }
 
 /* ---------- 4. Header ---------- */
-
-.scroll-progress {
-  position: fixed;
-  inset: 0 0 auto 0;
-  height: 3px;
-  z-index: 101;
-  pointer-events: none;
-  transition: opacity .3s;
-}
-.scroll-progress i {
-  display: block;
-  height: 100%;
-  width: 100%;
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  background: linear-gradient(90deg, var(--gold-soft), var(--gold), var(--clay));
-}
 
 .site-header {
   position: fixed;
@@ -634,7 +616,7 @@ strong { color: var(--ink); font-weight: 600; }
 }
 .seal text {
   font-family: var(--font-body);
-  font-size: 6px;
+  font-size: 14.8px;
   font-weight: 500;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -1596,7 +1578,7 @@ strong { color: var(--ink); font-weight: 600; }
 /* ---------- 20. Impressão ---------- */
 
 @media print {
-  .site-header, .to-top, .scroll-cue, .scroll-progress, .marquee, .form { display: none !important; }
+  .site-header, .to-top, .scroll-cue, .marquee, .form { display: none !important; }
   body { background: #fff; color: #000; }
   .reveal, .reveal-img, .js .reveal, .js .reveal-img { opacity: 1 !important; transform: none !important; clip-path: none !important; filter: none !important; }
   .js [data-split] .word { opacity: 1 !important; transform: none !important; }
