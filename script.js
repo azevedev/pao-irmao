@@ -32,8 +32,47 @@
      --------------------------------------------------------------- */
 
   var header = $('#site-header');
+  var headerInner = $('.site-header__inner');
   var progress = $('#scroll-progress i');
   var toTop = $('#to-top');
+
+  /* Largura da ilha: o cabeçalho recolhido tem a largura do próprio conteúdo.
+     Como não dá para animar até `fit-content`, a largura é medida aqui e entra
+     no CSS como --bar-w, que é um comprimento e portanto animável. */
+  // Altura do cabeçalho já recolhido, usada para parar na altura certa ao
+  // saltar para uma âncora. Lida durante a medição, com as transições paradas.
+  var stuckHeight = 0;
+
+  function measureBar() {
+    if (!header || !headerInner) return;
+
+    var wasStuck = header.classList.contains('is-stuck');
+    header.classList.add('is-measuring');
+    if (!wasStuck) header.classList.add('is-stuck');
+
+    stuckHeight = header.offsetHeight;
+
+    var width = 0;
+    if (window.innerWidth >= 921) {
+      headerInner.style.maxWidth = 'none';
+      headerInner.style.width = 'max-content';
+      width = Math.ceil(headerInner.getBoundingClientRect().width);
+      headerInner.style.width = '';
+      headerInner.style.maxWidth = '';
+    }
+
+    if (!wasStuck) header.classList.remove('is-stuck');
+    void header.offsetWidth;
+    header.classList.remove('is-measuring');
+
+    if (width > 0) header.style.setProperty('--bar-w', width + 'px');
+  }
+
+  measureBar();
+  window.addEventListener('resize', measureBar, { passive: true });
+  window.addEventListener('load', measureBar);
+  // As fontes trocam depois da primeira pintura e mudam a largura dos textos.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureBar);
 
   scrollTasks.push(function (y) {
     if (header) header.classList.toggle('is-stuck', y > 24);
@@ -507,7 +546,9 @@
     e.preventDefault();
     closeNav();
 
-    var offset = header ? header.offsetHeight - 6 : 0;
+    // O cabeçalho encolhe assim que a rolagem começa, então a conta usa a
+    // altura já recolhida. Usar a altura atual pararia alguns pixels fora.
+    var offset = (stuckHeight || (header ? header.offsetHeight : 0)) - 6;
     window.scrollTo({
       top: target.getBoundingClientRect().top + window.pageYOffset - offset,
       behavior: reduced ? 'auto' : 'smooth'

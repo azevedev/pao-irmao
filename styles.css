@@ -255,8 +255,9 @@ strong { color: var(--ink); font-weight: 600; }
   position: fixed;
   inset: 0 0 auto 0;
   height: 3px;
-  z-index: 120;
+  z-index: 95;
   pointer-events: none;
+  transition: opacity .3s;
 }
 .scroll-progress i {
   display: block;
@@ -272,23 +273,82 @@ strong { color: var(--ink); font-weight: 600; }
   inset: 0 0 auto 0;
   z-index: 100;
   padding-top: env(safe-area-inset-top, 0px);
-  transition: background .4s var(--ease), box-shadow .4s var(--ease), backdrop-filter .4s;
-}
-.site-header.is-stuck {
-  background: rgba(251,247,241,.82);
-  backdrop-filter: saturate(150%) blur(14px);
-  -webkit-backdrop-filter: saturate(150%) blur(14px);
-  box-shadow: 0 1px 0 rgba(120,100,74,.13), 0 12px 30px -24px rgba(74,60,44,.6);
 }
 
+/* No topo da página o cabeçalho ocupa toda a largura e não tem cor. Ao rolar,
+   ele recolhe até a largura do próprio conteúdo e a ilha desce por trás. */
 .site-header__inner {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
+  max-width: var(--shell);
   height: 5.1rem;
-  transition: height .4s var(--ease);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  transition:
+    max-width .62s var(--ease-out),
+    height .42s var(--ease),
+    padding-inline .5s var(--ease-out);
 }
-.site-header.is-stuck .site-header__inner { height: 4.35rem; }
+.site-header.is-stuck .site-header__inner {
+  /* --bar-w é medido no script: a largura natural do conteúdo do cabeçalho. */
+  max-width: min(var(--bar-w, 62rem), calc(100% - 2 * var(--gutter)));
+  height: 4.35rem;
+  padding-inline: 1.2rem;
+}
+
+/* O conteúdo fica acima da ilha. */
+.brand,
+.nav,
+.nav-toggle { position: relative; z-index: 1; }
+
+/* A ilha. Cantos de baixo convexos, cantos de cima côncavos, que emendam a
+   forma na borda superior da página. Os cantos côncavos são dois quadrados
+   com um quarto de círculo recortado por máscara. */
+.site-header__bar {
+  --inv: 20px;
+  position: absolute;
+  inset: 0;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: #FFFCF7;
+  box-shadow: inset 0 -1px 0 rgba(196,176,144,.4);
+  /* drop-shadow segue o recorte real, inclusive os cantos côncavos.
+     Um box-shadow desenharia a sombra do retângulo e apareceria uma emenda. */
+  filter:
+    drop-shadow(0 1px 1px rgba(74,60,44,.10))
+    drop-shadow(0 8px 18px rgba(74,60,44,.14));
+  opacity: 0;
+  transform: translateY(-101%);
+  transition: opacity .4s var(--ease), transform .58s var(--ease-out);
+}
+.site-header.is-stuck .site-header__bar { opacity: 1; transform: none; }
+
+.site-header__bar::before,
+.site-header__bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: var(--inv);
+  height: var(--inv);
+  background: inherit;
+  pointer-events: none;
+}
+.site-header__bar::before {
+  left: calc(var(--inv) * -1);
+  -webkit-mask: radial-gradient(circle at 0 100%, transparent var(--inv), #000 calc(var(--inv) + .5px));
+          mask: radial-gradient(circle at 0 100%, transparent var(--inv), #000 calc(var(--inv) + .5px));
+}
+.site-header__bar::after {
+  right: calc(var(--inv) * -1);
+  -webkit-mask: radial-gradient(circle at 100% 100%, transparent var(--inv), #000 calc(var(--inv) + .5px));
+          mask: radial-gradient(circle at 100% 100%, transparent var(--inv), #000 calc(var(--inv) + .5px));
+}
+
+/* Durante a medição da largura nada pode animar. */
+.site-header.is-measuring,
+.site-header.is-measuring * { transition: none !important; }
 
 .brand {
   display: inline-flex;
@@ -1426,6 +1486,15 @@ strong { color: var(--ink); font-weight: 600; }
 
 @media (max-width: 920px) {
   .nav-toggle { display: block; }
+
+  /* No telefone o conteúdo do cabeçalho é só a marca e o botão. Recolher até
+     essa largura daria uma pastilha pequena demais, então a ilha recolhe até
+     as margens da página e mantém a mesma forma. */
+  .site-header.is-stuck .site-header__inner {
+    max-width: calc(100% - 2 * var(--gutter));
+    padding-inline: .9rem;
+  }
+  .site-header__bar { --inv: 14px; }
 
   /* Painel simples: opacidade e deslocamento. Sem clip-path, que falha em
      navegadores móveis antigos, e com altura dinâmica por causa da barra do
